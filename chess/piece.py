@@ -1,6 +1,4 @@
 import pygame
-#import sys
-#import time
 import random
 from .constants import BLACK, WIN, GB, GW, ALPHA, GRID, BLANKGRID
 
@@ -12,6 +10,7 @@ class Piece(pygame.sprite.Sprite):
         self.square = square
         self.color = color
         self.image = image
+        self.rect = None
 
     def __repr__(self):
         return str(self.color)
@@ -57,6 +56,7 @@ class King(Piece):
 
         def __repr__(self):
             return str(self.color) + ' king'
+        
 
 kings = pygame.sprite.Group()
 
@@ -115,7 +115,6 @@ def set_board(win_streak):
     print()
     print()
     print(GRID)
-
 
 def picksquare(color):
     '''picks an available square, then removes that square from future available squares'''
@@ -205,6 +204,7 @@ def draw_pieces():
         color = getattr(king, 'color')
         raw_image = pygame.image.load(f'{str(color).lower()}_king.png').convert()
         piece_image = pygame.transform.scale(raw_image, (80, 80))
+        king.rect = piece_image.get_rect()
         WIN.blit(piece_image, (pos_x, pos_y))
 
     for knight in knights:
@@ -213,6 +213,7 @@ def draw_pieces():
         color = getattr(knight, 'color')
         raw_image = pygame.image.load(f'{str(color).lower()}_knight.png').convert()
         piece_image = pygame.transform.scale(raw_image, (80, 80))
+        knight.rect = piece_image.get_rect()
         WIN.blit(piece_image, (pos_x, pos_y))
 
     for bishop in bishops:
