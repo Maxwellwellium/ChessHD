@@ -49,14 +49,19 @@ def main():
 
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if restart_button.rect.collidepoint((pos_x, pos_y)):
-                    if pygame.mouse.get_pressed()[0]:# and restart_button.clicked == False:
-                        restart_button.clicked = True
-                        set_board(1)
-                        print('clicked')
+                    # if pygame.mouse.get_pressed()[0]:# and restart_button.clicked == False:
+                    #     restart_button.clicked = True
+                    #     set_board(1)
+                    #     print('clicked')
+                    set_board(1)
+                    restart_button.clicked = True
 
-            # if event.type == pygame.MOUSEBUTTONUP: # and restart_button.clicked == True:
-            #     restart_button.clicked = False
-            #     print('released')
+            if event.type == pygame.MOUSEBUTTONUP: # and restart_button.clicked == True:
+                pos_x, pos_y = pygame.mouse.get_pos()
+                if restart_button.clicked == True and restart_button.rect.collidepoint((pos_x, pos_y)):
+                    print('button clicked')
+                restart_button.clicked = False
+                print('released')
 
         #board.draw_squares(WIN)
         draw_pieces()

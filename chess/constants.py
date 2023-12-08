@@ -20,7 +20,7 @@ BLANKGRID = []
 for col in ALPHA:
     for row in range(1, 9):
         BLANKGRID.append([col, row])
-GRID = BLANKGRID
+GRID = BLANKGRID.copy()
 
 GW = [[], [], [], []] #bottom half of board
 GB = [[], [], [], []] #top half of board

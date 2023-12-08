@@ -2,7 +2,7 @@ import pygame
 #import sys
 #import time
 import random
-from .constants import BLACK, WIN, GB, GW, ALPHA, GRID
+from .constants import BLACK, WIN, GB, GW, ALPHA, GRID, BLANKGRID
 
 class Piece(pygame.sprite.Sprite):
     def __init__(self, x, y, square, color, image):
@@ -107,11 +107,7 @@ def set_board(win_streak):
             GB[1].append(GRID[i])
         elif GRID[i][1] == 8:
             GB[0].append(GRID[i])
-    #games get progressively more difficult the more you win
-    #level = 1
-    #if win_streak == True:
-    #    level += 1
-    #regular chess is 39
+    
     black_material = 20 + (6 * win_streak)
     white_material = 20 + (3 * win_streak)
     create_side('black', black_material)
