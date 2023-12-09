@@ -1,6 +1,6 @@
 import pygame
 import random
-from .constants import BLACK, WIN, GB, GW, ALPHA, GRID, BLANKGRID
+from .constants import BLACK, WIN, GB, GW, ALPHA, GRID
 
 class Piece(pygame.sprite.Sprite):
     def __init__(self, x, y, square, color, image):

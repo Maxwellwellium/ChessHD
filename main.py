@@ -1,5 +1,5 @@
 import pygame
-from chess.constants import YELLOW, ALPHA, WIN, FPS
+from chess.constants import YELLOW, ALPHA, WIN, FPS, GRID
 from chess.board import Board, Button
 from chess.piece import draw_pieces, set_board
 
@@ -13,7 +13,6 @@ def cursor_coordinates():
         coord_x = int(((pos_x - 350) / 100))    #use 350 to offset x
         coord_y = int(8 - (pos_y / 100))
         z = [ALPHA[coord_x], coord_y + 1]
-        #print(z)   #for debugging
         return coord_x, coord_y, z
     
 def print_coords(x, y, z):
@@ -24,8 +23,20 @@ def print_coords(x, y, z):
             chess_coord = font.render(f'Square: {z[0] + str(z[1])}', True, YELLOW)
             WIN.blit(chess_coord, (1200, 750))  #prints coords in bottom right corner
             WIN.blit(font.render(f'{z[0] + str(z[1])}', True, YELLOW), (x * 100 + 352, 702 - y * 100))  
-            #^prints coords on highlighted square, offset slightly
             return z
+        
+def piece_select():
+    '''detects which square the player has clicked and selects the piece on it if there is one'''
+    pos_x, pos_y = pygame.mouse.get_pos()
+    if pos_x > 350 and pos_x < 1150 and pos_y > 0:
+        output = cursor_coordinates()
+        square = output[2]
+        print(square)
+        if square in GRID:
+            print('success')
+            index = GRID.index(square)
+            print(index)
+        
 
 restart_button = Button(50, 50, 1.25, 'restart')
 
@@ -48,8 +59,11 @@ def main():
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 print('test')
-                print(cursor_coordinates())
+                #print(cursor_coordinates())
                 pos_x, pos_y = pygame.mouse.get_pos()
+                if pos_x > 350 and pos_x < 1150 and pos_y > 0:
+                    piece_select()
+
                 if restart_button.rect.collidepoint((pos_x, pos_y)):
                     set_board(1)
                     restart_button.clicked = True
