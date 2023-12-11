@@ -1,5 +1,5 @@
 import pygame
-from chess.constants import YELLOW, ALPHA, WIN, FPS, GRID
+from chess.constants import YELLOW, ALPHA, WIN, FPS, BLANKGRID
 from chess.board import Board, Button
 from chess.piece import draw_pieces, set_board
 
@@ -25,17 +25,56 @@ def print_coords(x, y, z):
             WIN.blit(font.render(f'{z[0] + str(z[1])}', True, YELLOW), (x * 100 + 352, 702 - y * 100))  
             return z
         
-def piece_select():
+def square_select():
     '''detects which square the player has clicked and selects the piece on it if there is one'''
+    global square_selected
+    global currentsquare
     pos_x, pos_y = pygame.mouse.get_pos()
     if pos_x > 350 and pos_x < 1150 and pos_y > 0:
+        square_selected = True
         output = cursor_coordinates()
         square = output[2]
-        print(square)
-        if square in GRID:
-            print('success')
-            index = GRID.index(square)
-            print(index)
+        newsquare = square.copy()
+        print(output)
+        # print(square)
+        piece = piece_detect(square)
+        if piece != None:
+            legal_moves(piece)
+            print(piece)
+        if square_selected == True:
+            if currentsquare == newsquare and currentsquare != None:
+                square_selected == False
+
+        return newsquare
+
+
+def legal_moves(piece):
+    '''finds all legal moves for a piece and returns them as a list'''
+    pass
+
+def draw_overlay(square):
+    '''draws the overlay image over the selected square'''
+    x_og = ALPHA.index(square[0])
+    y_og = square[1]
+    pos_x = (x_og * 100) + 350
+    pos_y = (800 - (y_og * 100))
+    raw_image = pygame.image.load(f'select_overlay.png').convert_alpha()
+    piece_image = pygame.transform.scale(raw_image, (100, 100))
+    WIN.blit(piece_image, (pos_x, pos_y))
+
+def piece_detect(square):
+        '''detects if there is a piece on a given square'''
+        #Finds index of square in grid, then uses that index to access square in current grid to see if theres a piece
+        global CURRENT_GRID
+        index = BLANKGRID.index(square)
+        # print(index)
+        # print(CURRENT_GRID[index])
+        if len(CURRENT_GRID[index]) == 3:
+            print('piece found')
+            return CURRENT_GRID[index][2]
+        else:
+            print('no piece')
+            return None
         
 
 restart_button = Button(50, 50, 1.25, 'restart')
@@ -46,7 +85,12 @@ def main():
     clock = pygame.time.Clock()
     board = Board()
 
-    set_board(1)
+    global CURRENT_GRID
+    CURRENT_GRID = set_board(1)
+    global square_selected
+    global currentsquare
+    square_selected = False
+    currentsquare = None
     while run:
         clock.tick(FPS) #makes game run at stable FPS
         board.draw_squares(WIN)
@@ -59,13 +103,15 @@ def main():
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 print('test')
-                #print(cursor_coordinates())
+                # print(cursor_coordinates())
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if pos_x > 350 and pos_x < 1150 and pos_y > 0:
-                    piece_select()
+                    
+                    # print(f'clicking grid{CURRENT_GRID}')
+                    currentsquare = square_select()
 
                 if restart_button.rect.collidepoint((pos_x, pos_y)):
-                    set_board(1)
+                    CURRENT_GRID = set_board(1)
                     restart_button.clicked = True
             
 
@@ -77,10 +123,12 @@ def main():
                 print('released')
 
         draw_pieces()
+        if square_selected == True:
+            draw_overlay(currentsquare)
         res = cursor_coordinates()
         if res:
             x, y, z = res
-        print_coords(x, y, z)
+            print_coords(x, y, z)
         pygame.display.update()
     
     pygame.quit()

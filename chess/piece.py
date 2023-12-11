@@ -1,6 +1,7 @@
 import pygame
 import random
-from .constants import BLACK, WIN, GB, GW, ALPHA, GRID
+from .constants import BLACK, WIN, GB, GW, ALPHA, BLANKGRID
+import copy
 
 class Piece(pygame.sprite.Sprite):
     def __init__(self, x, y, square, color, image):
@@ -24,14 +25,12 @@ class Pawn(Piece):
                 self.direction = -1
         def __repr__(self):
             return str(self.color) + ' pawn'
-
 class Knight(Piece):
         def __init__(self, x, y, square, color, image):
             super().__init__(x, y, square, color, image)
         
         def __repr__(self):
             return str(self.color) + ' knight'
-
 class Bishop(Piece):
         def __init__(self, x, y, square, color, image):
             super().__init__(x, y, square, color, image)
@@ -57,92 +56,79 @@ class King(Piece):
         def __repr__(self):
             return str(self.color) + ' king'
         
-
 kings = pygame.sprite.Group()
-
 knights = pygame.sprite.Group() 
 bishops = pygame.sprite.Group() 
 rooks = pygame.sprite.Group() 
 queens = pygame.sprite.Group()
-
 pawns = pygame.sprite.Group() 
 
 def set_board(win_streak):
-    '''will reset the board depending on the level'''
-    #first delete all previous pieces
+    '''Resets the board, with material dependent on winstreak'''
+    #Delete all previous pieces
     kings.empty()
     knights.empty()
     bishops.empty()
     rooks.empty()
     queens.empty()
     pawns.empty()
-    global GRID 
-    GRID = []
-    for col in ALPHA:
-        for row in range(1, 9):
-            GRID.append([col, row])
-    
-    print(GRID)
-    print()
-    #print(BLANKGRID)
-    global GW
-    global GB
-    GW = [[], [], [], []] #bottom half of board
-    GB = [[], [], [], []] #top half of board
 
-    for i in range(len(GRID)): 
-        if GRID[i][1] == 1:
-            GW[0].append(GRID[i])
-        elif GRID[i][1] == 2:
-            GW[1].append(GRID[i])
-        elif GRID[i][1] == 3:
-            GW[2].append(GRID[i])
-        elif GRID[i][1] == 4:
-            GW[3].append(GRID[i])
-        elif GRID[i][1] == 5:
-            GB[3].append(GRID[i])
-        elif GRID[i][1] == 6:
-            GB[2].append(GRID[i])
-        elif GRID[i][1] == 7:
-            GB[1].append(GRID[i])
-        elif GRID[i][1] == 8:
-            GB[0].append(GRID[i])
+    #Redefine global variables as clear board
+    global CURRENT_GRID 
+    CURRENT_GRID = copy.deepcopy(BLANKGRID)
+    global blackrows
+    blackrows = copy.deepcopy(GB)
+    global whiterows
+    whiterows = copy.deepcopy(GW)
+    # print(f'setboard 1st grid: {CURRENT_GRID}')
     
+    #Populate clear board with pieces
     black_material = 20 + (6 * win_streak)
     white_material = 20 + (3 * win_streak)
     create_side('black', black_material)
     create_side('white', white_material)
-    print()
-    print()
-    print(GRID)
+    # print()
+    # print(f'setboard 2nd grid: {CURRENT_GRID}')
+
+    return CURRENT_GRID
 
 def picksquare(color):
-    '''picks an available square, then removes that square from future available squares'''
+    '''Picks an available square, then removes that square from future available squares'''
+    #use correct spawning list depending on piece color
+    global whiterows
+    global blackrows
     if color == 'white':
-        rows = GW
+        rows = whiterows
     else:
-        rows = GB
-    chosen =  False
+        rows = blackrows
+    
+    #Fills up the back rows first, once they are full, they will spawn on the next row etc...
     row = 0
-    print(rows)
     while len(rows[row]) == 0:
         row += 1
-    #print(rows[row])
-    #print(f'row = {row}')
+    # print(f'rows: {rows}')
+    # print(f'grid black: {GB}')
+    # print(rows[row])
+    # print(f'row = {row}')
+
+    #If first spawn fails, will continue to attempt until successful
+    chosen =  False
     while chosen == False: 
         choice = random.choices(rows[row])
-        #print(f'choice square = {choice}')
+        # print(f'choice square = {choice}')
 
-        if choice[0] in GRID and len(choice[0]) == 2:
+        #checks if square exists and is available
+        if choice[0] in CURRENT_GRID and len(choice[0]) == 2:
             rows[row].remove(choice[0])
             chosen = True
         else:
             rows[row].remove(choice[0])
         #implement later, when all possible spots are full ignore any attempts to create extra pieces
+    
     return choice
 
 def convertcoords(piece_square):
-    '''takes the chess square the piece is on and converts it into xy coordinates'''
+    '''takes the chess square a piece is on and converts it into xy coordinates'''
     x_og = ALPHA.index(piece_square[0][0])
     y_og = piece_square[0][1]
 
@@ -151,10 +137,10 @@ def convertcoords(piece_square):
     return pos_x, pos_y
 
 def append_available(taken_square, piece):
-    '''adds object to the grid'''
-    global GRID
-    x = GRID.index(taken_square)
-    GRID[x] += [piece]
+    '''adds piece to the grid at its square'''
+    global CURRENT_GRID
+    x = CURRENT_GRID.index(taken_square)
+    CURRENT_GRID[x] += [piece]
 
 def create_k(color):
     '''creates the king, places it on the board and deletes the taken square from available spawning squares'''
@@ -167,7 +153,7 @@ def create_k(color):
 def create(piece, color):
     piece_spawn = picksquare(color)
     pos_x, pos_y = convertcoords(piece_spawn)
-    global GRID
+    global CURRENT_GRID
     
     if piece == 'knight':
         piece = Knight(pos_x, pos_y, piece_spawn, color, f'{str(color).lower()}_knight.png')

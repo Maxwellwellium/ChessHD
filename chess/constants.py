@@ -1,4 +1,5 @@
 import pygame
+import copy
 
 WIDTH, HEIGHT = 800, 800
 ROWS, COLS = 8, 8
@@ -20,25 +21,24 @@ BLANKGRID = []
 for col in ALPHA:
     for row in range(1, 9):
         BLANKGRID.append([col, row])
-GRID = BLANKGRID.copy()
 
 GW = [[], [], [], []] #bottom half of board
 GB = [[], [], [], []] #top half of board
 
-for i in range(len(GRID)): 
-    if GRID[i][1] == 1:
-        GW[0].append(GRID[i])
-    elif GRID[i][1] == 2:
-        GW[1].append(GRID[i])
-    elif GRID[i][1] == 3:
-        GW[2].append(GRID[i])
-    elif GRID[i][1] == 4:
-        GW[3].append(GRID[i])
-    elif GRID[i][1] == 5:
-        GB[3].append(GRID[i])
-    elif GRID[i][1] == 6:
-        GB[2].append(GRID[i])
-    elif GRID[i][1] == 7:
-        GB[1].append(GRID[i])
-    elif GRID[i][1] == 8:
-        GB[0].append(GRID[i])
+for i in range(len(BLANKGRID)): 
+    if BLANKGRID[i][1] == 1:
+        GW[0].append(BLANKGRID[i])
+    elif BLANKGRID[i][1] == 2:
+        GW[1].append(BLANKGRID[i])
+    elif BLANKGRID[i][1] == 3:
+        GW[2].append(BLANKGRID[i])
+    elif BLANKGRID[i][1] == 4:
+        GW[3].append(BLANKGRID[i])
+    elif BLANKGRID[i][1] == 5:
+        GB[3].append(BLANKGRID[i])
+    elif BLANKGRID[i][1] == 6:
+        GB[2].append(BLANKGRID[i])
+    elif BLANKGRID[i][1] == 7:
+        GB[1].append(BLANKGRID[i])
+    elif BLANKGRID[i][1] == 8:
+        GB[0].append(BLANKGRID[i])
