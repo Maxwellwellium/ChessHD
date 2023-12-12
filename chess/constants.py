@@ -16,6 +16,7 @@ CYAN = (48, 84, 84)
 YELLOW = (200, 200, 0)
 
 ALPHA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+NUM = [1, 2, 3, 4, 5, 6, 7, 8]
 
 BLANKGRID = []
 for col in ALPHA:

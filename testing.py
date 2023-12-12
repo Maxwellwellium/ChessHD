@@ -1,51 +1,68 @@
-from chess.constants import ALPHA, GRID, BLACK, GB, GW
+from chess.constants import ALPHA, BLACK, GB, GW
 #from chess.piece import Pawn
 import random
 #import pygame
 
+z = []
+x = 5
+y = -1
+z.append(x + y)
+print(z)
 
+# allmoves = []
+# square = ['a', 8]
+# file, rank = square
 
+# existing_ranks = [rank]
+# if rank-1 in NUM:
+#     existing_ranks.append(rank-1)
+# if rank+1 in NUM:
+#     existing_ranks.append(rank+1)
 
+# existing_files = [file]
+# index = ALPHA.index(file)
+# if index != 0:
+#     existing_files.append(ALPHA[index-1])
+# if index != 7:
+#     existing_files.append(ALPHA[index+1])
+# for ranks in existing_ranks:
+#     for files in existing_files:
+#         allmoves.append([files, ranks])
+# allmoves.remove([file, rank])
 
-def picksquare(color):
-    '''picks an available square'''
-    if color == 'white':
-        rows = GW
-    else:
-        rows = GB
+# print(allmoves)
+
+# def picksquare(color):
+#     '''picks an available square'''
+#     if color == 'white':
+#         rows = GW
+#     else:
+#         rows = GB
     
-    current_row = rows[0]
-    x = 0
-    if len(current_row) != 0:
-        choice = random.choices(current_row)
-    else:
-        x += 1
-        current_row = rows[x]
-        choice = random.choices(current_row)
-    print(choice)
-    if choice[0] in GRID:
-        spawn = choice[0]
-        print(spawn)
-    else:
-        current_row = current_row.remove(choice[0])
-        print(current_row)
-    return spawn
+#     current_row = rows[0]
+#     x = 0
+#     if len(current_row) != 0:
+#         choice = random.choices(current_row)
+#     else:
+#         x += 1
+#         current_row = rows[x]
+#         choice = random.choices(current_row)
+#     print(choice)
+#     if choice[0] in GRID:
+#         spawn = choice[0]
+#         print(spawn)
+#     else:
+#         current_row = current_row.remove(choice[0])
+#         print(current_row)
+#     return spawn
 
-picksquare('black')
-picksquare('white')
-picksquare('black')
-picksquare('black')
-picksquare('black')
-picksquare('black')
-print(GRID)
-
-
-
-
-
-
-
-
+# picksquare('black')
+# picksquare('white')
+# picksquare('black')
+# picksquare('black')
+# picksquare('black')
+# picksquare('black')
+# print(GRID)
 
 
 # GW = [[], [], [], []]

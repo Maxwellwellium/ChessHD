@@ -19,10 +19,11 @@ class Piece(pygame.sprite.Sprite):
 class Pawn(Piece):
         def __init__(self, x, y, square, color, image):
             super().__init__(x, y, square, color, image)
-            if self.color == BLACK:
-                self.direction = 1
-            else:
+            if self.color == 'black':
                 self.direction = -1
+            if self.color == 'white':
+                self.direction = 1
+            self.untouched = True
         def __repr__(self):
             return str(self.color) + ' pawn'
 class Knight(Piece):
