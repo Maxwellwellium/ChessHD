@@ -3,11 +3,31 @@ from chess.constants import ALPHA, BLACK, GB, GW
 import random
 #import pygame
 
-z = []
-x = 5
-y = -1
-z.append(x + y)
-print(z)
+
+l = [0, 1]
+
+# x = l[0]
+# y = 5
+# x.append(y)
+
+a = isinstance(l[0], list)
+if a == True:
+    print('test1')
+else:
+    print('test2')
+# x = True
+# print(x)
+# x = not x
+# print(x)
+
+
+
+
+# z = []
+# x = 5
+# y = -1
+# z.append(x + y)
+# print(z)
 
 # allmoves = []
 # square = ['a', 8]

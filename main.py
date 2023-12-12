@@ -2,7 +2,7 @@ import pygame
 import copy
 from chess.constants import YELLOW, ALPHA, NUM, WIN, FPS, BLANKGRID
 from chess.board import Board, Button
-from chess.piece import King, Pawn, Bishop, Knight, Rook, Queen, draw_pieces, set_board
+from chess.piece import King, Pawn, Bishop, Knight, Rook, Queen, draw_pieces, set_board, convertcoords
 
 pygame.font.init()  #renders the font
 pygame.display.set_caption('ChessHD')
@@ -31,6 +31,8 @@ def square_select():
     global square_selected
     global currentsquare
     global legalmoves
+    global whiteturn
+    global choosingpiece
     pos_x, pos_y = pygame.mouse.get_pos()
 
     #only executes when player clicks on grid
@@ -39,23 +41,103 @@ def square_select():
         output = cursor_coordinates()
         square = output[2]
         newsquare = square.copy()
-        # print(square)
 
         #For deselecting a square
         if square_selected == True and currentsquare != None:
-            print(f'current{currentsquare}')
-            print(f'new{newsquare}')
+            print(f'current square: {currentsquare}████ new square: {newsquare}')
             if currentsquare == newsquare:
                 square_selected == False
+                choosingpiece = None
                 legalmoves = []
                 return None
 
-        piece = piece_detect(square)
-        if piece != None:
+        #determines if a piece has been chosen to move, if not it does so
+        if choosingpiece == None:
+            return pick_piece(square)
+        else:
+            return move_piece(square)
+
+def pick_piece(square):
+    '''picks a piece intended to move'''
+    global choosingpiece
+    newsquare = square.copy()
+    piece = piece_detect(square)
+    if piece != None:
+        piece_color = getattr(piece, 'color')
+        if (piece_color == 'white' and whiteturn == True) or (piece_color == 'black' and whiteturn == False):
             legal_moves(piece, square)
-            print(piece)
-            
-        return newsquare
+            choosingpiece = piece
+            return newsquare
+        
+def move_piece(square):
+    '''will move the selected piece to that spot'''
+    global square_selected
+    global currentsquare
+    global legalmoves
+    global whiteturn
+    global choosingpiece
+    piecesquare = getattr(choosingpiece, 'square')
+    print(f"piece's square = {piecesquare}████ clicked square = {square}")
+    if square == piecesquare[0]:
+        square_selected = False
+        currentsquare = None
+        choosingpiece = None
+    elif square in legalmoves:
+        print(f'{choosingpiece} moved to {square}')
+
+        proper = isinstance(piecesquare[0], list)
+        if proper == True:
+            properpiecesquare = piecesquare[0]
+        else:
+            properpiecesquare = piecesquare
+
+        moveupdate(properpiecesquare, square)
+
+        whiteturn = not whiteturn
+        square_selected = False
+        currentsquare = None
+        choosingpiece = None
+    else:
+        print(f'████ ILLEGAL MOVE ████')
+    return square
+
+
+def moveupdate(piecesquare, square):
+    '''updates the grid, and objects involved in the actual move'''
+    global choosingpiece
+    global CURRENT_GRID
+    global BLANKGRID
+    print(f'GRID BEFORE UPDATING = {CURRENT_GRID}')
+    print(f'████piecesquare is {piecesquare}████')
+    moved_index = copy.deepcopy(BLANKGRID.index(piecesquare))
+    cap_index = copy.deepcopy(BLANKGRID.index(square))
+    print(f'moved index = {moved_index}, captured index = {cap_index}')
+
+    #updates the attributes of the piece moving
+    setattr(choosingpiece, 'square', square)
+    z = [square]
+    pos_x, pos_y = convertcoords(z)
+    setattr(choosingpiece, 'x', pos_x)
+    setattr(choosingpiece, 'y', pos_y)
+    if choosingpiece.__class__ == Pawn:
+        untouched = getattr(choosingpiece, 'untouched')
+        if untouched == True:
+            setattr(choosingpiece, 'untouched', False)
+
+    #updates current grid to show there is no piece at old spot
+    CURRENT_GRID[moved_index] = copy.deepcopy(BLANKGRID[moved_index])
+
+    #in the case that the new spot has a piece already there
+    captured_piece = piece_detect(square)
+    if captured_piece != None:
+        print(f'{captured_piece} WAS CAPTURED')
+        CURRENT_GRID[cap_index][2] = (choosingpiece)
+        pygame.sprite.Sprite.kill(captured_piece)
+    else:
+        #updates new spot to reference the new piece
+        CURRENT_GRID[cap_index].append(choosingpiece)
+
+    print(f'GRID AFTER UPDATING = {CURRENT_GRID}')
 
 
 def legal_moves(piece, square):
@@ -64,15 +146,12 @@ def legal_moves(piece, square):
     global legalmoves
     legalmoves = []
     file, rank = square
-    print(file)
-    print(rank)
 
     if piece.__class__ == Pawn:
-        print(f'class pawn')
-        print(f'square: {square}')
+        print(f'Pawn at {square}')
         untouched = getattr(piece, 'untouched')
         direction = getattr(piece, 'direction')
-        print(f'moved before?: {untouched}')
+        print(f'unmoved?: {untouched}')
 
         if (rank + direction) in NUM:
             allmoves.append([file, (rank + direction)])
@@ -101,12 +180,10 @@ def legal_moves(piece, square):
                 capturedcolor = getattr(captured, 'color')
                 if piececolor != capturedcolor:
                     legalmoves.append(move)
-        print(f'legalmoves: {legalmoves}')
 
 
     elif piece.__class__ == Knight:
-        print(f'knight movement not implemented')
-        print(f'square: {square}')
+        print(f'Knight at {square}')
         #checks to see if ranks exist, skips them if they dont
         existing_ranks = []
         existing_files = []
@@ -123,12 +200,10 @@ def legal_moves(piece, square):
         if index <= 6:
             existing_files.append(ALPHA[index+1])
 
-        print(existing_ranks)
-        print(existing_files)
         for ranks in existing_ranks:
             for files in existing_files:
                 allmoves.append([files, ranks])
-        print(f'knight moves 1:{allmoves}')
+        # print(f'knight moves 1:{allmoves}')
 
         #clear ranks and files to avoid messing up the next for loops
         existing_ranks.clear()
@@ -144,12 +219,10 @@ def legal_moves(piece, square):
         if index < 6:
             existing_files.append(ALPHA[index+2])
 
-        print(existing_ranks)
-        print(existing_files)
         for ranks in existing_ranks:
             for files in existing_files:
                 allmoves.append([files, ranks])
-        print(f'knight moves 2:{allmoves}')
+        # print(f'knight moves 2:{allmoves}')
 
         #removes already occupied pieces
         for move in allmoves:
@@ -161,11 +234,9 @@ def legal_moves(piece, square):
                 capturedcolor = getattr(captured, 'color')
                 if piececolor != capturedcolor:
                     legalmoves.append(move)
-        print(f'legalmoves: {legalmoves}')
 
     if piece.__class__ == Bishop or piece.__class__ == Queen:
-        print(f'bishop movement not implemented')
-        print(f'square: {square}')
+        print(f'Bishop or Queen at {square}')
         topleft = True
         topright = True
         bottomleft = True
@@ -261,11 +332,9 @@ def legal_moves(piece, square):
                 else: break
         file, rank = copysquare
         index = ALPHA.index(file)
-        print(f'legalmoves: {legalmoves}')
 
     if piece.__class__ == Rook or piece.__class__ == Queen:
-        print(f'rook movement not implemented')
-        print(f'square: {square}')
+        print(f'Rook or Queen at {square}')
         up = True
         down = True
         left = True
@@ -348,11 +417,9 @@ def legal_moves(piece, square):
                 else: break
         file, rank = copysquare
         index = ALPHA.index(file)
-        print(f'legalmoves: {legalmoves}')
 
     elif piece.__class__ == King:
-        print(f'class king')
-        print(f'square: {square}')
+        print(f'King at {square}')
         
         #checks to see if ranks exist, skips them if they dont
         existing_ranks = [rank]
@@ -375,7 +442,7 @@ def legal_moves(piece, square):
                 allmoves.append([files, ranks])
         #removes the square the king is currently on
         allmoves.remove([file, rank])
-        print(f'all available moves: {allmoves}')
+        # print(f'all available moves: {allmoves}')
         #this should be enough for the king, since game ends on capture
 
         #removes moves from list if there is a piece there of the same color
@@ -388,10 +455,8 @@ def legal_moves(piece, square):
                 capturedcolor = getattr(captured, 'color')
                 if piececolor != capturedcolor:
                     legalmoves.append(move)
-        print(f'legalmoves: {legalmoves}')
-
+    print(f'legalmoves: {legalmoves}')
     return legalmoves
-
 
 def draw_select_overlay(square):
     '''draws the overlay image over the selected square'''
@@ -417,7 +482,7 @@ def piece_detect(square):
         '''detects if there is a piece on a given square'''
         #Finds index of square in grid, then uses that index to access square in current grid to see if theres a piece
         global CURRENT_GRID
-        index = BLANKGRID.index(square)
+        index = copy.deepcopy(BLANKGRID.index(square))
         # print(index)
         # print(CURRENT_GRID[index])
         if len(CURRENT_GRID[index]) == 3:
@@ -425,8 +490,7 @@ def piece_detect(square):
             return CURRENT_GRID[index][2]
         else:
             print('no piece')
-            return None
-        
+            return None  
 
 restart_button = Button(50, 50, 1.25, 'restart')
 
@@ -435,15 +499,18 @@ def main():
     run = True
     clock = pygame.time.Clock()
     board = Board()
-
     global CURRENT_GRID
     CURRENT_GRID = set_board(1)
     global square_selected
     global currentsquare
     global legalmoves
-    legalmoves = []
+    global whiteturn
+    global choosingpiece
     square_selected = False
     currentsquare = None
+    legalmoves = []
+    whiteturn = True
+    choosingpiece = None
     while run:
         clock.tick(FPS) #makes game run at stable FPS
         board.draw_squares(WIN)
@@ -461,23 +528,26 @@ def main():
                 if pos_x > 350 and pos_x < 1150 and pos_y > 0:
                     
                     # print(f'clicking grid{CURRENT_GRID}')
+                    print(f'clicking grid{BLANKGRID}')
                     currentsquare = square_select()
 
                 if restart_button.rect.collidepoint((pos_x, pos_y)):
                     CURRENT_GRID = set_board(1)
+                    whiteturn = True
                     restart_button.clicked = True
             
 
             if event.type == pygame.MOUSEBUTTONUP:
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if restart_button.clicked == True and restart_button.rect.collidepoint((pos_x, pos_y)):
-                    print('button clicked')
+                    pass
                 restart_button.clicked = False
-                print('released')
+                # print('released')
 
         draw_pieces()
         if square_selected == True and currentsquare != None:
             draw_select_overlay(currentsquare)
+        if choosingpiece != None:
             draw_legal_overlay(legalmoves)
 
         res = cursor_coordinates()
@@ -489,6 +559,3 @@ def main():
     pygame.quit()
 
 main()
-
-#compare z0 and z1, then use varibale to reference z3
-#then remove it from location and print in another location
