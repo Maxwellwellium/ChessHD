@@ -3,7 +3,7 @@ import copy
 import random
 from chess.constants import YELLOW, ALPHA, NUM, WIN, FPS, BLANKGRID
 from chess.board import Board, Button
-from chess.piece import King, Pawn, Bishop, Knight, Rook, Queen, draw_pieces, set_board, convertcoords
+from chess.piece import King, Pawn, Bishop, Knight, Rook, Queen, draw_pieces, set_board, convertcoords, game_over
 
 pygame.font.init()  #renders the font
 pygame.display.set_caption('ChessHD')
@@ -526,13 +526,17 @@ def main():
     legalmoves = []
     whiteturn = True
     choosingpiece = None
+    winstreak = 0
     pygame.mixer.music.load('amaski_war_drums.mp3')
-    pygame.mixer.music.play(-1)
+    # pygame.mixer.music.play(-1)
     while run:
         clock.tick(FPS) #makes game run at stable FPS
         board.draw_squares(WIN)
         restart_button.draw()
-        
+        over, winstreak = game_over(winstreak)
+        if over == True:
+            whiteturn = True
+            CURRENT_GRID = set_board(winstreak)
         #event handler
         for event in pygame.event.get():
             #quit program

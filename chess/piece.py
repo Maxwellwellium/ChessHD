@@ -256,3 +256,41 @@ def create_side(color, amount):
         create(piece, color)
     for pawn in pawn_list:
         create_p(color)
+
+def game_over(winstreak):
+    '''test'''
+    kingleft = []
+
+    over = False
+    for king in kings:
+        color = getattr(king, 'color')
+        kingleft.append(color)
+    if len(kingleft) == 1:
+        if kingleft[0] == 'white':
+            gamewon = pygame.image.load(f'enemylegiondefeated.png').convert_alpha()
+            gamewon = pygame.transform.scale(gamewon, (1500, 800))
+            newround = pygame.image.load(f'newround.png').convert_alpha()
+            newround = pygame.transform.scale(newround, (1500, 800))
+            # x = 150
+            # while x > 0:
+            WIN.blit(gamewon, (0, 0))
+                # pygame.time.wait(500)
+                # x -= 1
+            # y = 150
+            # while y > 0:
+            WIN.blit(newround, (0, 0))
+                # pygame.time.wait(500)
+                # y -= 1
+            winstreak += 1
+            print('game won')
+        else:
+            gamelost = pygame.image.load(f'gamelost.png').convert_alpha()
+            gamelost = pygame.transform.scale(gamelost, (1500, 800))
+            # z = 150
+            # while z > 0:
+            WIN.blit(gamelost, (0, 0))
+                # z -= 1
+            winstreak = 0
+            print('game lost')
+        over = True
+    return over, winstreak

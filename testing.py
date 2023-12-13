@@ -1,24 +1,27 @@
+import pygame
 from chess.constants import ALPHA, BLACK, GB, GW
-#from chess.piece import Pawn
+from chess.piece import King, game_over
 import random
 #import pygame
 
+game_over()
 
-l = [0, 1]
 
-# x = l[0]
-# y = 5
-# x.append(y)
+# l = [0, 1]
 
-a = isinstance(l[0], list)
-if a == True:
-    print('test1')
-else:
-    print('test2')
-# x = True
-# print(x)
-# x = not x
-# print(x)
+# # x = l[0]
+# # y = 5
+# # x.append(y)
+
+# a = isinstance(l[0], list)
+# if a == True:
+#     print('test1')
+# else:
+#     print('test2')
+# # x = True
+# # print(x)
+# # x = not x
+# # print(x)
 
 
 
