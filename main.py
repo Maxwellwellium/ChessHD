@@ -26,7 +26,85 @@ def print_coords(x, y, z):
             WIN.blit(chess_coord, (1200, 750))  #prints coords in bottom right corner
             WIN.blit(font.render(f'{z[0] + str(z[1])}', True, YELLOW), (x * 100 + 352, 702 - y * 100))  
             return z
-        
+
+def print_info(winstreak, bm, wm):
+    '''test'''
+    font = pygame.font.Font(None, 30)
+    global currentsquare
+    global legalmoves
+    global whiteturn
+    global choosingpiece
+
+
+    y = 50
+    z = len(legalmoves)
+    var6 = None
+    var7 = None
+    var8 = None
+    var9 = None
+    var10 = None
+    var11 = None
+    var12 = None
+    if whiteturn == True:
+        var1 = font.render(f'White to Move', True, YELLOW) 
+    else:
+        var1 = font.render(f'Black to Move', True, YELLOW)
+    if choosingpiece == None:
+        var2 = font.render(f'Piece Not Selected', True, YELLOW)
+    else:
+        var2 = font.render(f'Moving {choosingpiece} on {currentsquare}', True, YELLOW)
+        if z < 3:
+            var6 = font.render(f'Legal Moves: {legalmoves[0: 2]}', True, YELLOW)
+        elif z < 7:
+            var6 = font.render(f'Legal Moves: {legalmoves[0:2]}', True, YELLOW)
+            var7 = font.render(f'{legalmoves[2:6]}', True, YELLOW)
+        elif z < 11:
+            var6 = font.render(f'Legal Moves: {legalmoves[0:2]}', True, YELLOW)
+            var7 = font.render(f'{legalmoves[2:6]}', True, YELLOW)
+            var8 = font.render(f'{legalmoves[6:10]}', True, YELLOW)
+        elif z < 15:
+            var6 = font.render(f'Legal Moves: {legalmoves[0:2]}', True, YELLOW)
+            var7 = font.render(f'{legalmoves[2:6]}', True, YELLOW)
+            var8 = font.render(f'{legalmoves[6:10]}', True, YELLOW)
+            var9 = font.render(f'{legalmoves[10:14]}', True, YELLOW)
+        elif z < 19:
+            var6 = font.render(f'Legal Moves: {legalmoves[0:2]}', True, YELLOW)
+            var7 = font.render(f'{legalmoves[2:6]}', True, YELLOW)
+            var8 = font.render(f'{legalmoves[6:10]}', True, YELLOW)
+            var9 = font.render(f'{legalmoves[10:14]}', True, YELLOW)
+            var10 = font.render(f'{legalmoves[14:18]}', True, YELLOW)
+        elif z < 23:
+            var6 = font.render(f'Legal Moves: {legalmoves[0:2]}', True, YELLOW)
+            var7 = font.render(f'{legalmoves[2:6]}', True, YELLOW)
+            var8 = font.render(f'{legalmoves[6:10]}', True, YELLOW)
+            var9 = font.render(f'{legalmoves[10:14]}', True, YELLOW)
+            var10 = font.render(f'{legalmoves[14:18]}', True, YELLOW)
+            var11 = font.render(f'{legalmoves[18:22]}', True, YELLOW)
+        else:
+            var6 = font.render(f'Legal Moves: {legalmoves[0:2]}', True, YELLOW)
+            var7 = font.render(f'{legalmoves[2:6]}', True, YELLOW)
+            var8 = font.render(f'{legalmoves[6:10]}', True, YELLOW)
+            var9 = font.render(f'{legalmoves[10:14]}', True, YELLOW)
+            var10 = font.render(f'{legalmoves[14:18]}', True, YELLOW)
+            var11 = font.render(f'{legalmoves[18:22]}', True, YELLOW)
+            var12 = font.render(f'{legalmoves[22:]}', True, YELLOW)
+    if winstreak == 0:
+        var3 = font.render(f'No Winstreak', True, YELLOW)
+    else:
+        var3 = font.render(f'Current Winstreak: {winstreak}', True, YELLOW)    
+    var4 = font.render(f'Starting Black Material: {bm}', True, YELLOW)
+    var5 = font.render(f'Starting White Material: {wm}', True, YELLOW)
+    
+    extra_vars = [var6, var7, var8, var9, var10, var11, var12]
+    variables = [var1, var2, var3, var4, var5]
+    for var in extra_vars:
+        if var != None:
+            variables.append(var)
+
+    for var in variables:
+        WIN.blit(var, (1175, y))
+        y += 50
+
 def square_select():
     '''detects which square the player has clicked and selects the piece on it if there is one'''
     global square_selected
@@ -507,6 +585,7 @@ def piece_detect(square):
             return None  
 
 restart_button = Button(50, 50, 1.25, 'restart')
+instructions_button = Button(50, 250, 1.25, 'instructions')
 
 def main():
     pygame.init()
@@ -515,7 +594,7 @@ def main():
     clock = pygame.time.Clock()
     board = Board()
     global CURRENT_GRID
-    CURRENT_GRID = set_board(1)
+    CURRENT_GRID, bm, wm = set_board(1)
     global square_selected
     global currentsquare
     global legalmoves
@@ -533,10 +612,11 @@ def main():
         clock.tick(FPS) #makes game run at stable FPS
         board.draw_squares(WIN)
         restart_button.draw()
+        instructions_button.draw()
         over, winstreak = game_over(winstreak)
         if over == True:
             whiteturn = True
-            CURRENT_GRID = set_board(winstreak)
+            CURRENT_GRID, bm, wm = set_board(winstreak)
         #event handler
         for event in pygame.event.get():
             #quit program
@@ -554,9 +634,10 @@ def main():
                     currentsquare = square_select()
 
                 if restart_button.rect.collidepoint((pos_x, pos_y)):
-                    sound = pygame.mixer.Sound('reset.mp3')
-                    pygame.mixer.Sound.play(sound)
-                    CURRENT_GRID = set_board(1)
+                    # sound = pygame.mixer.Sound('reset.mp3')
+                    # pygame.mixer.Sound.play(sound)
+                    CURRENT_GRID, bm, wm = set_board(1)
+                    winstreak = 0
                     whiteturn = True
                     restart_button.clicked = True
             
@@ -578,6 +659,7 @@ def main():
         if res:
             x, y, z = res
             print_coords(x, y, z)
+        print_info(winstreak, bm, wm)
         pygame.display.update()
     
     pygame.quit()

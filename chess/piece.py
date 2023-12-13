@@ -86,12 +86,12 @@ def set_board(win_streak):
     #Populate clear board with pieces
     black_material = 20 + (6 * win_streak)
     white_material = 20 + (3 * win_streak)
-    create_side('black', black_material)
-    create_side('white', white_material)
+    bm = create_side('black', black_material)
+    wm = create_side('white', white_material)
     # print()
     # print(f'setboard 2nd grid: {CURRENT_GRID}')
 
-    return CURRENT_GRID
+    return CURRENT_GRID, bm, wm
 
 def picksquare(color):
     '''Picks an available square, then removes that square from future available squares'''
@@ -256,6 +256,7 @@ def create_side(color, amount):
         create(piece, color)
     for pawn in pawn_list:
         create_p(color)
+        return total
 
 def game_over(winstreak):
     '''test'''
