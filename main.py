@@ -1,5 +1,6 @@
 import pygame
 import copy
+import random
 from chess.constants import YELLOW, ALPHA, NUM, WIN, FPS, BLANKGRID
 from chess.board import Board, Button
 from chess.piece import King, Pawn, Bishop, Knight, Rook, Queen, draw_pieces, set_board, convertcoords
@@ -77,6 +78,7 @@ def move_piece(square):
     global whiteturn
     global choosingpiece
     piecesquare = getattr(choosingpiece, 'square')
+    movesound = pygame.mixer.Sound('move.wav')
     print(f"piece's square = {piecesquare}████ clicked square = {square}")
     if square == piecesquare[0]:
         square_selected = False
@@ -97,10 +99,11 @@ def move_piece(square):
         square_selected = False
         currentsquare = None
         choosingpiece = None
+        pygame.mixer.Sound.play(movesound)
     else:
         print(f'████ ILLEGAL MOVE ████')
-    return square
 
+    return square
 
 def moveupdate(piecesquare, square):
     '''updates the grid, and objects involved in the actual move'''
@@ -129,8 +132,20 @@ def moveupdate(piecesquare, square):
 
     #in the case that the new spot has a piece already there
     captured_piece = piece_detect(square)
+    sound1 = pygame.mixer.Sound('captured.mp3')
+    sound2 = pygame.mixer.Sound('horse1.mp3')
+    sound3 = pygame.mixer.Sound('horse2.mp3')
+    sound4 = pygame.mixer.Sound('king.mp3')
+
     if captured_piece != None:
         print(f'{captured_piece} WAS CAPTURED')
+        if captured_piece.__class__ == Knight:
+            x = random.choice([sound2, sound3])
+            pygame.mixer.Sound.play(x)
+        elif captured_piece.__class__ == King:
+            pygame.mixer.Sound.play(sound4)
+        else:
+            pygame.mixer.Sound.play(sound1)
         CURRENT_GRID[cap_index][2] = (choosingpiece)
         pygame.sprite.Sprite.kill(captured_piece)
     else:
@@ -138,7 +153,6 @@ def moveupdate(piecesquare, square):
         CURRENT_GRID[cap_index].append(choosingpiece)
 
     print(f'GRID AFTER UPDATING = {CURRENT_GRID}')
-
 
 def legal_moves(piece, square):
     '''finds all legal moves for a piece and returns them as a list'''
@@ -496,6 +510,7 @@ restart_button = Button(50, 50, 1.25, 'restart')
 
 def main():
     pygame.init()
+    pygame.mixer.init()
     run = True
     clock = pygame.time.Clock()
     board = Board()
@@ -511,10 +526,13 @@ def main():
     legalmoves = []
     whiteturn = True
     choosingpiece = None
+    pygame.mixer.music.load('amaski_war_drums.mp3')
+    pygame.mixer.music.play(-1)
     while run:
         clock.tick(FPS) #makes game run at stable FPS
         board.draw_squares(WIN)
         restart_button.draw()
+        
         #event handler
         for event in pygame.event.get():
             #quit program
@@ -532,6 +550,8 @@ def main():
                     currentsquare = square_select()
 
                 if restart_button.rect.collidepoint((pos_x, pos_y)):
+                    sound = pygame.mixer.Sound('reset.mp3')
+                    pygame.mixer.Sound.play(sound)
                     CURRENT_GRID = set_board(1)
                     whiteturn = True
                     restart_button.clicked = True
@@ -557,5 +577,6 @@ def main():
         pygame.display.update()
     
     pygame.quit()
+    pygame.mixer.quit()
 
 main()
