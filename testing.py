@@ -1,10 +1,10 @@
-import pygame
-from chess.constants import ALPHA, BLACK, GB, GW
-from chess.piece import King, game_over
-import random
-#import pygame
+# import pygame
+# from chess.constants import ALPHA, BLACK, GB, GW
+# from chess.piece import King, game_over
+# import random
 
-game_over()
+
+# ██ This file was for testing things before implementing them into the main script ██
 
 
 # l = [0, 1]

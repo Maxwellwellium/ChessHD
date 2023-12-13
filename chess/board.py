@@ -1,19 +1,20 @@
 import pygame
 from .constants import BLACK, ROWS, WHITE, SQUARE_SIZE, CYAN, WIDTH, HEIGHT, WIN
-#from .piece import Pawn, Piece
 
 class Board:
     def __init__(self):
         self.selected_piece = None
-#draws the checkerboard pattern onto the screen
+
+# draws the checkerboard pattern onto the screen
     def draw_squares(self, win):
-        '''Draws the Checkerboard pattern'''
+        '''Draws the board'''
         win.fill(CYAN)
         pygame.draw.rect(win, BLACK, ((350, 0), (WIDTH, HEIGHT)))
-        for row in range(ROWS): #these loops draw the checkerboard pattern
+        for row in range(ROWS): # these loops draw the checkerboard pattern
             for col in range(row % 2, ROWS, 2):
                 pygame.draw.rect(win, WHITE, (row*SQUARE_SIZE + 350, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
+# for all interactable squares on the screen aside from peices
 class Button:
     def __init__(self, x, y, scale, image):
         raw_image = pygame.image.load(f'{str(image).lower()}_button.png').convert()
@@ -27,6 +28,6 @@ class Button:
         self.clicked = False
 
     def draw(self):
-
+        '''draws the button onto the screen'''
         WIN.blit(self.display_image, (self.x, self.y))
 
